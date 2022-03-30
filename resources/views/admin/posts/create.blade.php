@@ -26,18 +26,34 @@
             <label for="image" class="form-label">Carica immagine</label>
             <input type="text" class="form-control" id="image" placeholder="Inserisci url immagine" name="imag">
           </div>
-          <div class="form-group w-25">
+
+          <div class="form-group w-25 ">
             <label for="exampleFormControlSelect1">Scegli la categoria</label>
             <select class="form-control" id="exampleFormControlSelect1" name='category_id'>
                 <option value="">Nessuna categoria</option>
                 @foreach($categories as $category)
               <option @if(old('category_id') == $category->id) selected  @endif value="{{$category->id}}">{{$category->label}}</option>
               @endforeach
-              
             </select>
           </div>
+          <div class="col-12 mt-4  rounded mb-4 align-items-center">
+            <h5 class="color-white">Scegli le categorie</h5>
+            @foreach($tags as $tag)
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="Tag-{{$tag->label}}" value="{{$tag->id}}" name='tags[]'>
+              <label class="form-check-label" for="Tag-{{$tag->label}}">{{$tag->label}}</label>
+            </div>
+            @endforeach
+          </div>
+
           <button type="submit" class='btn btn-primary'>Aggiungi Post</button>
     </form>
 </div>
 @endsection
+
+<style >
+  h5{
+    color: white;
+  }
+</style>
 
