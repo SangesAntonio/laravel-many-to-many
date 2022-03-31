@@ -32,7 +32,7 @@ class PostController extends Controller
     {
 
         $post = Post::all();
-        $tags = Tag::all();
+        $tags = Tag::orderBy('label', 'DESC');
         $categories = Category::all();
         return view('admin.posts.create', compact('tags', 'post', 'categories'));
     }
@@ -49,19 +49,23 @@ class PostController extends Controller
             'title' => 'required|max:100|min:2',
             'content' => 'required',
             'image' => 'unique:posts',
-            'category_id' => 'nullable|exists:categories,id'
+            'category_id' => 'nullable|exists:categories,id',
+            'tags' => 'nullable|exists:tags,id'
 
         ], [
             'required' => 'Il campo :attribute è obbligatorio',
             'content.min' => 'La lunghezza minima è :min',
-            'unique' => "L \'immagine $request->image è già presente!"
+            'unique' => "L \'immagine $request->image è già presente!",
+            'tags.exists' => 'Il tag è già selezionato'
         ]);
         $data = $request->all();
-
+        //dd($data);
         $post = new Post();
-        $post->fill($data);
         $post->slug = Str::slug($post->title, '-');
+        $post->fill($data);
         $post->save();
+
+        if (array_key_exists('tags', $data))  $post->tags()->attach($data['tags']);
         return redirect()->route('admin.posts.index');
     }
 
@@ -74,7 +78,8 @@ class PostController extends Controller
     public function show(Post $posts, $id)
     {
         $post = Post::find($id);
-        return view('admin.posts.show', compact('post'));
+        $tags = Tag::orderBy('label', 'DESC');
+        return view('admin.posts.show', compact('tags', 'post'));
     }
 
     /**
@@ -83,11 +88,14 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Post $post, Category $category)
+    public function edit(Post $post, Category $category, Tag $tag)
     {
         $categories = Category::all();
 
-        return view('admin.posts.edit', compact('post', 'categories'));
+        $tags = Tag::orderBy('label', 'DESC');
+        $post_tags_ids = $post->tags->pluck('id')->toArray();
+
+        return view('admin.posts.edit', compact('tags', 'post', 'categories', 'post_tags_ids'));
     }
 
     /**
@@ -109,9 +117,9 @@ class PostController extends Controller
         ]);
         $request->slug = Str::slug($request->title, '-');
         $data = $request->all();
-
         $post->update($data);
 
+        if (array_key_exists('tags', $data)) $post->tags()->sync($data['tags']);
         return redirect()->route('admin.posts.show', $post);
     }
 
