@@ -6,11 +6,10 @@
         <div class="col-8">{{$post->content}}</div>
         <div class="col-4"><img src="https://www.havocpoint.it/wp-content/uploads/2018/11/shrek-maxw-1280.jpg" alt="" class="img-fluid w-50"></div>
         <div class="col-8">
-            <ul class="">
+            <ul>
                 @foreach($post->tags as $tag)
                 <li class="">{{$tag->label}}</li>
-                @endforeach
-             
+                @endforeach             
             </ul>
         </div>
         <div class="col-12">

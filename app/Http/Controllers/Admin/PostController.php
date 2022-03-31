@@ -32,7 +32,8 @@ class PostController extends Controller
     {
 
         $post = Post::all();
-        $tags = Tag::orderBy('label', 'DESC');
+        $tags = Tag::orderBy('label', 'ASC')->get();
+
         $categories = Category::all();
         return view('admin.posts.create', compact('tags', 'post', 'categories'));
     }
@@ -78,7 +79,7 @@ class PostController extends Controller
     public function show(Post $posts, $id)
     {
         $post = Post::find($id);
-        $tags = Tag::orderBy('label', 'DESC');
+        $tags = Tag::all();
         return view('admin.posts.show', compact('tags', 'post'));
     }
 
@@ -92,7 +93,8 @@ class PostController extends Controller
     {
         $categories = Category::all();
 
-        $tags = Tag::orderBy('label', 'DESC');
+        $tags = Tag::orderBy('label', 'ASC')->get();
+
         $post_tags_ids = $post->tags->pluck('id')->toArray();
 
         return view('admin.posts.edit', compact('tags', 'post', 'categories', 'post_tags_ids'));
@@ -109,7 +111,9 @@ class PostController extends Controller
     {
         $request->validate([
             'title' => 'required| min:2',
-            'image' => 'unique:posts'
+            'image' => 'unique:posts',
+
+
 
         ], [
             'required' => 'Il campo :attribute è obbligatorio',
@@ -117,9 +121,12 @@ class PostController extends Controller
         ]);
         $request->slug = Str::slug($request->title, '-');
         $data = $request->all();
+
         $post->update($data);
 
+
         if (array_key_exists('tags', $data)) $post->tags()->sync($data['tags']);
+        else $post->tags()->detach();
         return redirect()->route('admin.posts.show', $post);
     }
 
