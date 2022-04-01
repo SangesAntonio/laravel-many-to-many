@@ -12,7 +12,7 @@
             </div>
         @endif
 
-    <form action="{{route('admin.posts.store')}}" method="post" class="w-75">
+    <form action="{{route('admin.posts.store')}}" method="post" class="w-75" enctype="multipart/form-data">
         @csrf
         <div class="mb-3">
             <label for="title" class="form-label">Titolo</label>
@@ -20,11 +20,11 @@
           </div>
         <div class="mb-3">
             <label for="content" class="form-label">Contenuto post</label>
-            <textarea class="form-control" id="content" placeholder="A cosa stai pensando?" name="content"></textarea>
+            <textarea class="form-control" id="content" placeholder="A cosa stai pensando?" name="content" value=" {{old('title')}}"></textarea>
           </div>
           <div class="mb-3">
             <label for="image" class="form-label">Carica immagine</label>
-            <input type="text" class="form-control" id="image" placeholder="Inserisci url immagine" name="imag">
+            <input type="file" class="form-control" id="image" name="image">
           </div>
 
           <!--select-->

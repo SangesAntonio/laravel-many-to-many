@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\facades\Storage;
 //use Illuminate\Validation\Rule;
 use App\Post;
 use App\Tag;
@@ -46,10 +47,11 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        //dd($request->all());
         $request->validate([
             'title' => 'required|max:100|min:2',
             'content' => 'required',
-            'image' => 'unique:posts',
+            'imag' => 'nullable | image',
             'category_id' => 'nullable|exists:categories,id',
             'tags' => 'nullable|exists:tags,id'
 
@@ -60,13 +62,22 @@ class PostController extends Controller
             'tags.exists' => 'Il tag è già selezionato'
         ]);
         $data = $request->all();
-        //dd($data);
         $post = new Post();
-        $post->slug = Str::slug($post->title, '-');
+
+        if (array_key_exists('image', $data)) {
+            $image_url = Storage::put('post_images', $data['image']);
+            $data['image'] = $image_url;
+        }
         $post->fill($data);
+
+
+        $post->slug = Str::slug($post->title, '-');
+
         $post->save();
 
         if (array_key_exists('tags', $data))  $post->tags()->attach($data['tags']);
+
+
         return redirect()->route('admin.posts.index');
     }
 
@@ -111,7 +122,8 @@ class PostController extends Controller
     {
         $request->validate([
             'title' => 'required| min:2',
-            'image' => 'unique:posts',
+            'image' => 'nullable | image',
+
 
 
 
@@ -121,6 +133,11 @@ class PostController extends Controller
         ]);
         $request->slug = Str::slug($request->title, '-');
         $data = $request->all();
+        if (array_key_exists('image', $data)) {
+            $image_url = Storage::put('post_images', $data['image']);
+            $data['image'] = $image_url;
+            if ($post->image) Storage::delete($post->image);
+        }
 
         $post->update($data);
 
@@ -138,6 +155,9 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
+
+
+        if ($post->image) Storage::delete($post->image);
         $post->delete();
         return redirect()->route('admin.posts.index');
     }

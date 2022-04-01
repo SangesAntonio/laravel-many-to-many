@@ -3,7 +3,7 @@
 
 <div class="container mt-4 ">
     
-    <form action="{{route('admin.posts.update', $post)}}" method="post" class="w-75">
+    <form action="{{route('admin.posts.update', $post)}}" method="post" class="w-75" enctype="multipart/form-data">
         @method('PUT')
         @csrf
         <div class="mb-3">
@@ -16,7 +16,7 @@
           </div>
           <div class="mb-3">
             <label for="image" class="form-label">Carica immagine</label>
-            <input type="text" class="form-control" id="image" placeholder="Inserisci url immagine" name="imag" value="{{old('image', $post->image)}}">
+            <input type="file" class="form-control" id="image" placeholder="Inserisci url immagine" name="image" value="{{old('image', $post->image)}}">
           </div>
           <div class="form-group w-25">
             <label for="exampleFormControlSelect1">Scegli la categoria</label>
