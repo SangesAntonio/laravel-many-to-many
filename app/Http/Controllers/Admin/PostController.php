@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\mail\SendNewMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\facades\Storage;
+use Illuminate\Support\facades\Mail;
 //use Illuminate\Validation\Rule;
 use App\Post;
 use App\Tag;
@@ -69,14 +71,11 @@ class PostController extends Controller
             $data['image'] = $image_url;
         }
         $post->fill($data);
-
-
         $post->slug = Str::slug($post->title, '-');
-
         $post->save();
 
         if (array_key_exists('tags', $data))  $post->tags()->attach($data['tags']);
-
+        Mail::to('adminantonio@blop.com')->send(new SendNewMail());
 
         return redirect()->route('admin.posts.index');
     }
